@@ -25,6 +25,7 @@ public abstract class BaseTest {
 	protected static final String SAMPLE_CURRENCY_EXCHANGE_RESPONSE_JSON_PATHNAME = "src/test/resources/currency_exchange_forecast_response/sample.json";
 	protected static final String TEST_CURRENCY_EXCHANGE_PAIR_LIST_PATHNAME = "src/test/resources/currency_exchange_pair_list/test_data.json";
 	protected static final String FILTERED_TEST_CURRENCY_EXCHANGE_PAIR_LIST_PATHNAME = "src/test/resources/currency_exchange_pair_list/test_data_filtered.json";
+	protected static final String TEST_SUMMARY_MAP_PATHNAME = "src/test/resources/exchange_summary_map/test_data.json";
 
 	protected final ObjectMapper mapper = new ObjectMapper()
 			.configure(DeserializationFeature.READ_DATE_TIMESTAMPS_AS_NANOSECONDS, true)

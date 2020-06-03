@@ -11,10 +11,14 @@ import pl.gamedia.BaseTest;
 import pl.gamedia.boundary.model.CurrencyExchangeRequest;
 import pl.gamedia.boundary.model.CurrencyExchangeResponse;
 import pl.gamedia.boundary.model.CurrencyExchangeSummary;
+import pl.gamedia.calculator.TransactionCalculator;
+import pl.gamedia.model.CurrencyExchangePairDto;
 import pl.gamedia.provider.CryptocurrencyDataProvider;
 import pl.gamedia.utils.Utilities;
 
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
@@ -23,29 +27,33 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class GetExchangeForecastProcessorTest extends BaseTest {
 
-	public static final double FEE_AMOUNT_PERCENTAGE = 1;
-	public static final double DOUBLE_COMPARISON_DELTA = 0.000000001;
-	private static final Integer PARALLEL_THREADS = 0;
-
 	private GetExchangeForecastProcessor processor;
 
 	@Mock
 	private CryptocurrencyDataProvider cryptocurrencyDataProvider;
 
+	@Mock
+	private TransactionCalculator transactionCalculator;
+
 	@Before
 	public void testSetup() {
-		processor = new GetExchangeForecastProcessor(cryptocurrencyDataProvider, new Utilities(), FEE_AMOUNT_PERCENTAGE, PARALLEL_THREADS, false);
+		processor = new GetExchangeForecastProcessor(cryptocurrencyDataProvider, transactionCalculator, new Utilities());
 	}
 
 	@Test
 	public void shouldGetExchangeForecastForTwoCurrencies() {
 		// given
 		CurrencyExchangeRequest request = load(SAMPLE_CURRENCY_EXCHANGE_REQUEST_JSON_PATHNAME, CurrencyExchangeRequest.class);
+		List<CurrencyExchangePairDto> pairDtos = load(
+				FILTERED_TEST_CURRENCY_EXCHANGE_PAIR_LIST_PATHNAME, new TypeReference<>() {});
 
 		when(cryptocurrencyDataProvider.getExchangePairList(
 				request.getFrom(), new HashSet<>(request.getTo())))
-				.thenReturn(Try.of(() -> load(FILTERED_TEST_CURRENCY_EXCHANGE_PAIR_LIST_PATHNAME,
-						new TypeReference<>() {})));
+				.thenReturn(Try.of(() -> pairDtos));
+
+		Map<String, CurrencyExchangeSummary> summaryMap = load(TEST_SUMMARY_MAP_PATHNAME, new TypeReference<>() {});
+		when(transactionCalculator.toCurrencyExchangeSummaryMap(pairDtos, request.getAmount()))
+				.thenReturn(summaryMap);
 
 		// when
 		CurrencyExchangeResponse response = processor.process(request).get();
