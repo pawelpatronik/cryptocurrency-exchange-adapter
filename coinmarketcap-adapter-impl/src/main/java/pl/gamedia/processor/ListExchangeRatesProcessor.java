@@ -38,14 +38,18 @@ public class ListExchangeRatesProcessor {
 				.getExchangePairList(sourceCurrency, utilities.toFilterSet(filter))
 				.map(utilities::toRatesMap)
 				.map(ratesMap -> validateRetrievedRatesResult(ratesMap, utilities.toFilterSet(filter)))
-				.map(ratesMap -> new ListExchangeRatesResponse()
-						.source(sourceCurrency)
-						.rates(ratesMap))
+				.map(ratesMap -> toListExchangeRatesResponse(sourceCurrency, ratesMap))
 				.mapFailure(Case($(instanceOf(Exception.class)),
 						throwable -> new ListExchangeRatesFailedException(OPERATION_FAILURE_MESSAGE, throwable)));
 	}
 
-	private Map<String, Double> validateRetrievedRatesResult(Map<String, Double> resultMap, Set<String> filter) {
+	private ListExchangeRatesResponse toListExchangeRatesResponse(String sourceCurrency, Map<String, String> ratesMap) {
+		return new ListExchangeRatesResponse()
+				.source(sourceCurrency)
+				.rates(ratesMap);
+	}
+
+	private Map<String, String> validateRetrievedRatesResult(Map<String, String> resultMap, Set<String> filter) {
 		if (!Objects.isNull(filter) && utilities.isBothSizeNotEqual(resultMap, filter)) {
 			throw new RuntimeException("Requested currency code could not be found in configured currency exchange");
 		}

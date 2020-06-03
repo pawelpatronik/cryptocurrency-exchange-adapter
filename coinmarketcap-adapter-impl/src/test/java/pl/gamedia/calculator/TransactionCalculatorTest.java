@@ -8,6 +8,7 @@ import pl.gamedia.BaseTest;
 import pl.gamedia.boundary.model.CurrencyExchangeSummary;
 import pl.gamedia.model.CurrencyExchangePairDto;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -30,7 +31,7 @@ public class TransactionCalculatorTest extends BaseTest {
 		// given
 		Integer parallelCalculationThreads = 4;
 		boolean isParallelCalculationEnabled = true;
-		double amount = 1.0 + (10000000000.0 - 1.0) * new Random().nextDouble();
+		String amount = String.valueOf(1.0 + (10000000000.0 - 1.0) * new Random().nextDouble());
 		List<CurrencyExchangePairDto> exchangePairs = IntStream
 				.range(0, NUMBER_OF_ENTRIES)
 				.mapToObj(i -> CurrencyExchangePairDto
@@ -57,7 +58,7 @@ public class TransactionCalculatorTest extends BaseTest {
 		// given
 		Integer parallelCalculationThreads = 0;
 		boolean isParallelCalculationEnabled = false;
-		double amount = 1.0 + (10000000000.0 - 1.0) * new Random().nextDouble();
+		String amount = String.valueOf(1.0 + (10000000000.0 - 1.0) * new Random().nextDouble());
 		List<CurrencyExchangePairDto> exchangePairs = IntStream
 				.range(0, NUMBER_OF_ENTRIES)
 				.mapToObj(i -> CurrencyExchangePairDto
@@ -84,7 +85,7 @@ public class TransactionCalculatorTest extends BaseTest {
 		// given
 		Integer parallelCalculationThreads = 0;
 		boolean isParallelCalculationEnabled = false;
-		double amount = 129.62309849823;
+		String amount = String.valueOf(129.62309849823);
 		String quote = "TSET";
 		List<CurrencyExchangePairDto> exchangePairs =
 				singletonList(CurrencyExchangePairDto.builder()
@@ -100,7 +101,9 @@ public class TransactionCalculatorTest extends BaseTest {
 
 		// then
 		assertNotNull(stringCurrencyExchangeSummaryMap);
-		assertEquals(16.604193277925827, stringCurrencyExchangeSummaryMap.get(quote).getResult(), 0.00000000000001);
+		assertEquals(
+				new BigDecimal("16.604193277925828140508929675656"),
+				new BigDecimal(stringCurrencyExchangeSummaryMap.get(quote).getResult()));
 	}
 
 }

@@ -34,7 +34,7 @@ public class TransactionCalculator {
 		this.isParallelCalculationEnabled = isParallelCalculationEnabled;
 	}
 
-	public Map<String, CurrencyExchangeSummary> toCurrencyExchangeSummaryMap(List<CurrencyExchangePairDto> exchangePairDtos, double amount) {
+	public Map<String, CurrencyExchangeSummary> toCurrencyExchangeSummaryMap(List<CurrencyExchangePairDto> exchangePairDtos, String amount) {
 		if (isParallelCalculationEnabled) {
 			ForkJoinPool pool = new ForkJoinPool(parallelCalculationThreads);
 			return Try
@@ -54,36 +54,38 @@ public class TransactionCalculator {
 		return new RuntimeException("Parallel execution failure: " + ex.getMessage(), ex);
 	}
 
-	private Map<String, CurrencyExchangeSummary> parallelCalculateCurrencyExchangeSummaries(List<CurrencyExchangePairDto> exchangePairDtos, double amount) {
+	private Map<String, CurrencyExchangeSummary> parallelCalculateCurrencyExchangeSummaries(List<CurrencyExchangePairDto> exchangePairDtos, String amount) {
 		return exchangePairDtos
 				.parallelStream()
 				.map(pairDto -> toCurrencyExchangeTuple(pairDto, amount))
 				.collect(Collectors.toMap(Tuple2::_1, Tuple2::_2));
 	}
 
-	private Map<String, CurrencyExchangeSummary> calculateCurrencyExchangeSummaries(List<CurrencyExchangePairDto> exchangePairDtos, double amount) {
+	private Map<String, CurrencyExchangeSummary> calculateCurrencyExchangeSummaries(List<CurrencyExchangePairDto> exchangePairDtos, String amount) {
 		return exchangePairDtos
 				.stream()
 				.map(pairDto -> toCurrencyExchangeTuple(pairDto, amount))
 				.collect(Collectors.toMap(Tuple2::_1, Tuple2::_2));
 	}
 
-	private Tuple2<String, CurrencyExchangeSummary> toCurrencyExchangeTuple(CurrencyExchangePairDto exchangePair, double amount) {
+	private Tuple2<String, CurrencyExchangeSummary> toCurrencyExchangeTuple(CurrencyExchangePairDto exchangePair, String amount) {
 		return new Tuple2<>(exchangePair.getQuote(), new CurrencyExchangeSummary()
 				.amount(amount)
 				.fee(calculateFee(amount))
-				.rate(exchangePair.getRate())
+				.rate(String.valueOf(exchangePair.getRate()))
 				.result(calculateExchangeResult(exchangePair.getRate(), amount)));
 	}
 
-	private double calculateExchangeResult(double value, double amount) {
+	private String calculateExchangeResult(double value, String amount) {
 		return BigDecimal.valueOf(value)
-				.multiply(BigDecimal.valueOf(amount))
+				.multiply(new BigDecimal(amount))
 				.multiply(BigDecimal.valueOf((100.0 - feeAmountPercentage) / 100.0))
-				.doubleValue();
+				.toPlainString();
 	}
 
-	private double calculateFee(double amount) {
-		return amount * feeAmountPercentage / 100;
+	private String calculateFee(String amount) {
+		return new BigDecimal(amount)
+				.multiply(BigDecimal.valueOf(feeAmountPercentage / 100))
+				.toPlainString();
 	}
 }

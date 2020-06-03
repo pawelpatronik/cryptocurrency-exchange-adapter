@@ -37,12 +37,12 @@ public class Utilities {
 		return pair.getMarketPairBase().getCurrencySymbol();
 	}
 
-	public Map<String, Double> toRatesMap(List<CurrencyExchangePairDto> pairs) {
+	public Map<String, String> toRatesMap(List<CurrencyExchangePairDto> pairs) {
 		return pairs
 				.stream()
 				.collect(Collectors.toMap(
 						CurrencyExchangePairDto::getQuote,
-						CurrencyExchangePairDto::getRate));
+						pair -> String.valueOf(pair.getRate())));
 	}
 
 	public Set<String> toFilterSet(List<String> list) {
