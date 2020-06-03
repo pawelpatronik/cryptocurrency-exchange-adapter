@@ -14,6 +14,8 @@ import pl.gamedia.boundary.model.CurrencyExchangeSummary;
 import pl.gamedia.provider.CryptocurrencyDataProvider;
 import pl.gamedia.utils.Utilities;
 
+import java.util.HashSet;
+
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
@@ -40,7 +42,7 @@ public class GetExchangeForecastProcessorTest extends BaseTest {
 		CurrencyExchangeRequest request = load(SAMPLE_CURRENCY_EXCHANGE_REQUEST_JSON_PATHNAME, CurrencyExchangeRequest.class);
 
 		when(cryptocurrencyDataProvider.getExchangePairList(
-				request.getFrom(), request.getTo()))
+				request.getFrom(), new HashSet<>(request.getTo())))
 				.thenReturn(Try.of(() -> load(FILTERED_TEST_CURRENCY_EXCHANGE_PAIR_LIST_PATHNAME,
 						new TypeReference<>() {})));
 

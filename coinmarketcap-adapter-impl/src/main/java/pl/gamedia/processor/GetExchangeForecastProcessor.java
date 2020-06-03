@@ -13,9 +13,7 @@ import pl.gamedia.model.CurrencyExchangePairDto;
 import pl.gamedia.provider.CryptocurrencyDataProvider;
 import pl.gamedia.utils.Utilities;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static io.vavr.API.$;
@@ -45,13 +43,12 @@ public class GetExchangeForecastProcessor {
 
 	public Try<CurrencyExchangeResponse> process(CurrencyExchangeRequest request) {
 		return cryptocurrencyDataProvider
-				.getExchangePairList(request.getFrom(), request.getTo())
-				.map(pairList -> validateRetrievedRatesResult(pairList, request.getTo()))
+				.getExchangePairList(request.getFrom(), utilities.toFilterSet(request.getTo()))
+				.map(pairList -> validateRetrievedRatesResult(pairList, utilities.toFilterSet(request.getTo())))
 				.map(exchangeRatesMap -> toCurrencyExchangeSummaryMap(exchangeRatesMap, request.getAmount()))
 				.map(summaryMap -> new CurrencyExchangeResponse()
 						.from(request.getFrom())
-						.to(request
-								.getTo()
+						.to(utilities.toFilterSet(request.getTo())
 								.stream()
 								.map(toCurrency -> new Tuple2<>(toCurrency, summaryMap.get(toCurrency)))
 								.collect(Collectors.toMap(Tuple2::_1, Tuple2::_2))))
@@ -82,7 +79,7 @@ public class GetExchangeForecastProcessor {
 		return amount * feeAmountPercentage / 100;
 	}
 
-	private List<CurrencyExchangePairDto> validateRetrievedRatesResult(List<CurrencyExchangePairDto> pairList, List<String> filter) {
+	private List<CurrencyExchangePairDto> validateRetrievedRatesResult(List<CurrencyExchangePairDto> pairList, Set<String> filter) {
 		if (!Objects.isNull(filter) && utilities.isBothSizeNotEqual(pairList, filter)) {
 			throw new RuntimeException("Requested currency code could not be found in configured currency exchange");
 		}

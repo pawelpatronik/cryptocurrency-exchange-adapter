@@ -7,7 +7,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.mortbay.util.SingletonList;
 import pl.gamedia.BaseTest;
 import pl.gamedia.coinmarketcap.model.CryptocurrencyMarketPairsLatestResponse;
 import pl.gamedia.coinmarketcap.service.CryptocurrencyMarketPairsLatestService;
@@ -16,10 +15,9 @@ import pl.gamedia.utils.Utilities;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
@@ -74,7 +72,7 @@ public class CryptocurrencyDataProviderTest extends BaseTest {
 
 		// when
 		Map<String, List<CurrencyExchangePairDto>> exchangePairList = cryptocurrencyDataProvider
-				.getExchangePairList(baseCurrency, asList("ETH", "USDT")).get()
+				.getExchangePairList(baseCurrency, Set.of("ETH", "USDT")).get()
 				.stream()
 				.collect(Collectors.groupingBy(CurrencyExchangePairDto::getQuote));
 

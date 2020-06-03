@@ -2,20 +2,16 @@ package pl.gamedia.processor;
 
 import io.vavr.control.Try;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import pl.gamedia.boundary.model.ListExchangeRatesResponse;
-import pl.gamedia.coinmarketcap.model.CryptocurrencyMarketPair;
-import pl.gamedia.coinmarketcap.service.CryptocurrencyMarketPairsLatestService;
 import pl.gamedia.exception.ListExchangeRatesFailedException;
-import pl.gamedia.model.CurrencyExchangePairDto;
 import pl.gamedia.provider.CryptocurrencyDataProvider;
 import pl.gamedia.utils.Utilities;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
+import java.util.Set;
 
 import static io.vavr.API.$;
 import static io.vavr.API.Case;
@@ -39,9 +35,9 @@ public class ListExchangeRatesProcessor {
 
 	public Try<ListExchangeRatesResponse> process(final String sourceCurrency, final List<String> filter) {
 		return cryptocurrencyDataProvider
-				.getExchangePairList(sourceCurrency, filter)
+				.getExchangePairList(sourceCurrency, utilities.toFilterSet(filter))
 				.map(utilities::toRatesMap)
-				.map(ratesMap -> validateRetrievedRatesResult(ratesMap, filter))
+				.map(ratesMap -> validateRetrievedRatesResult(ratesMap, utilities.toFilterSet(filter)))
 				.map(ratesMap -> new ListExchangeRatesResponse()
 						.source(sourceCurrency)
 						.rates(ratesMap))
@@ -49,7 +45,7 @@ public class ListExchangeRatesProcessor {
 						throwable -> new ListExchangeRatesFailedException(OPERATION_FAILURE_MESSAGE, throwable)));
 	}
 
-	private Map<String, Double> validateRetrievedRatesResult(Map<String, Double> resultMap, List<String> filter) {
+	private Map<String, Double> validateRetrievedRatesResult(Map<String, Double> resultMap, Set<String> filter) {
 		if (!Objects.isNull(filter) && utilities.isBothSizeNotEqual(resultMap, filter)) {
 			throw new RuntimeException("Requested currency code could not be found in configured currency exchange");
 		}
