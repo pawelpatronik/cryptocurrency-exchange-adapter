@@ -21,11 +21,10 @@ import static org.mockito.Mockito.when;
 
 
 @RunWith(MockitoJUnitRunner.class)
-public class GetExchangeForecastProcessorTest extends BaseTest {
+public class GetExchangeForecastProcessorParallelTest extends BaseTest {
 
 	public static final double FEE_AMOUNT_PERCENTAGE = 1;
-	public static final double DOUBLE_COMPARISON_DELTA = 0.000000001;
-	private static final Integer PARALLEL_THREADS = 0;
+	private static final Integer PARALLEL_THREADS = 2;
 
 	private GetExchangeForecastProcessor processor;
 
@@ -34,7 +33,7 @@ public class GetExchangeForecastProcessorTest extends BaseTest {
 
 	@Before
 	public void testSetup() {
-		processor = new GetExchangeForecastProcessor(cryptocurrencyDataProvider, new Utilities(), FEE_AMOUNT_PERCENTAGE, PARALLEL_THREADS, false);
+		processor = new GetExchangeForecastProcessor(cryptocurrencyDataProvider, new Utilities(), FEE_AMOUNT_PERCENTAGE, PARALLEL_THREADS, true);
 	}
 
 	@Test
