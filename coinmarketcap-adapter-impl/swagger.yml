@@ -14,6 +14,7 @@ paths:
           in: path
           schema:
             type: string
+            minLength: 2
             default: BTC
           description: Mandatory parameter specifying a source platform of retrieved cryptocurrency exchange rates
           required: true
@@ -23,6 +24,7 @@ paths:
             type: array
             items:
               type: string
+              minLength: 2
           description: Optional parameter limiting list of returned entries to provided cryptocurrency codes
           required: false
       responses:
@@ -72,10 +74,12 @@ components:
       properties:
         from:
           type: string
+          minLength: 2
         to:
           type: array
           items:
             type: string
+            minLength: 2
           minItems: 1
         amount:
           type: string
