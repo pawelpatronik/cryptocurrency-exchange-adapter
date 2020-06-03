@@ -1,0 +1,8 @@
+{
+  "from": "BTC",
+  "to": {
+    "currencyB":"ETH",
+    "currencyC":"USDT"
+  },
+  "amount": 121.0
+}

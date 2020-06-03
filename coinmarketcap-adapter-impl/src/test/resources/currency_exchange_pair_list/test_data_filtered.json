@@ -1,0 +1,12 @@
+[
+  {
+    "base": "BTC",
+    "quote": "ETH",
+    "rate": 3.43524562006
+  },
+  {
+    "base": "BTC",
+    "quote": "USDT",
+    "rate": 0.3321
+  }
+]

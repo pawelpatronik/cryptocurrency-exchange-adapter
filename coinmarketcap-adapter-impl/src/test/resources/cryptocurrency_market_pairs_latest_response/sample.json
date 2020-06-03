@@ -1,0 +1,162 @@
+{
+  "status": {
+    "timestamp": "2020-06-01T21:43:23.424Z",
+    "error_code": 0,
+    "error_message": null,
+    "elapsed": 15,
+    "credit_count": 1,
+    "notice": "Some exchange details have redacted market details (indicated with \"-1\"). See the API FAQ for details."
+  },
+  "data": {
+    "id": 1,
+    "name": "Bitcoin",
+    "symbol": "BTC",
+    "num_market_pairs": 7919,
+    "market_pairs": [
+      {
+        "exchange": {
+          "id": 157,
+          "name": "BitMEX",
+          "slug": "bitmex"
+        },
+        "market_pair_base": {
+          "exchange_symbol": "XBT",
+          "currency_id": 1,
+          "currency_symbol": "BTC",
+          "currency_type": "cryptocurrency"
+        },
+        "market_pair_quote": {
+          "exchange_symbol": "USD",
+          "currency_id": 2781,
+          "currency_symbol": "USD",
+          "currency_type": "fiat"
+        },
+        "quote": {
+          "exchange_reported": {
+            "price": 9529,
+            "volume_24h_base": 188603.70580061,
+            "volume_24h_quote": 1797204712.57401,
+            "last_updated": "2019-08-30T18:50:02.000Z"
+          },
+          "USD": {
+            "price": 9529,
+            "volume_24h": 1797204712.57401,
+            "last_updated": "2019-08-30T18:50:02.000Z"
+          }
+        },
+        "market_id": 4902,
+        "market_pair": "BTC/USD",
+        "category": "derivatives",
+        "fee_type": "no-fees"
+      },
+      {
+        "exchange": {
+          "id": 157,
+          "name": "BitMEX",
+          "slug": "bitmex"
+        },
+        "market_pair_base": {
+          "exchange_symbol": "BTC",
+          "currency_id": 1,
+          "currency_symbol": "BTC",
+          "currency_type": "cryptocurrency"
+        },
+        "market_pair_quote": {
+          "exchange_symbol": "BRL",
+          "currency_id": 2783,
+          "currency_symbol": "BRL",
+          "currency_type": "fiat"
+        },
+        "quote": {
+          "exchange_reported": {
+            "price": 39711.76,
+            "volume_24h_base": 70709.23237213,
+            "volume_24h_quote": 2807988065.74626,
+            "last_updated": "2019-08-30T18:51:00.000Z"
+          },
+          "USD": {
+            "price": 9616.81674467624,
+            "volume_24h": 679997729.879503,
+            "last_updated": "2019-08-30T18:51:00.000Z"
+          }
+        },
+        "market_id": 3377,
+        "market_pair": "BTC/BRL",
+        "category": "spot",
+        "fee_type": "unknown"
+      },
+      {
+        "exchange": {
+          "id": 157,
+          "name": "BitMEX",
+          "slug": "bitmex"
+        },
+        "market_pair_base": {
+          "exchange_symbol": "ETH",
+          "currency_id": 1027,
+          "currency_symbol": "ETH",
+          "currency_type": "cryptocurrency"
+        },
+        "market_pair_quote": {
+          "exchange_symbol": "BTC",
+          "currency_id": 1,
+          "currency_symbol": "BTC",
+          "currency_type": "cryptocurrency"
+        },
+        "quote": {
+          "exchange_reported": {
+            "price": 0.2911,
+            "volume_24h_base": 807898.7491,
+            "volume_24h_quote": 14275.570896597,
+            "last_updated": "2019-08-30T18:50:14.000Z"
+          },
+          "USD": {
+            "price": 168.780840965528,
+            "volume_24h": 136357830.288096,
+            "last_updated": "2019-08-30T18:50:14.000Z"
+          }
+        },
+        "market_id": 27683,
+        "market_pair": "ETH/BTC",
+        "category": "spot",
+        "fee_type": "transaction-mining"
+      },
+      {
+        "exchange": {
+          "id": 157,
+          "name": "BitMEX",
+          "slug": "bitmex"
+        },
+        "market_pair_base": {
+          "exchange_symbol": "BTC",
+          "currency_id": 1,
+          "currency_symbol": "BTC",
+          "currency_type": "cryptocurrency"
+        },
+        "market_pair_quote": {
+          "exchange_symbol": "USDT",
+          "currency_id": 825,
+          "currency_symbol": "USDT",
+          "currency_type": "cryptocurrency"
+        },
+        "quote": {
+          "exchange_reported": {
+            "price": 0.3321,
+            "volume_24h_base": 15561.953857,
+            "volume_24h_quote": 148127080.266009,
+            "last_updated": "2019-08-30T18:50:12.000Z"
+          },
+          "USD": {
+            "price": 9547.50945653677,
+            "volume_24h": 148577901.611896,
+            "last_updated": "2019-08-30T18:50:12.000Z"
+          }
+        },
+        "market_id": 23691,
+        "market_pair": "BTC/USDT",
+        "category": "spot",
+        "fee_type": "percentage"
+      }
+    ]
+  }
+}

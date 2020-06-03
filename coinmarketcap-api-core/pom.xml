@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>gamedia-recruitment-task</artifactId>
+        <groupId>pl.gamedia</groupId>
+        <version>0.0.1-SNAPSHOT</version>
+    </parent>
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>coinmarketcap-api-core</artifactId>
+
+    <properties>
+        <swagger.input.spec>${project.basedir}/swagger.yml</swagger.input.spec>
+        <swagger.generated.sources.path>${project.build.directory}/generated-sources</swagger.generated.sources.path>
+        <generated.sources.java.path>main/java</generated.sources.java.path>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.openapitools</groupId>
+                <artifactId>openapi-generator-maven-plugin</artifactId>
+                <version>4.3.1</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>${swagger.input.spec}</inputSpec>
+                            <configOptions>
+                                <sourceFolder>${generated.sources.java.path}</sourceFolder>
+                                <withXml>false</withXml>
+                                <generateApiDocumentation>true</generateApiDocumentation>
+                                <interfaceOnly>true</interfaceOnly>
+                                <library>spring-boot</library>
+                                <dateLibrary>java8-localdatetime</dateLibrary>
+                                <booleanGetterPrefix>is</booleanGetterPrefix>
+                            </configOptions>
+                            <output>${swagger.generated.sources.path}</output>
+                            <language>spring</language>
+                            <modelPackage>pl.gamedia.coinmarketcap.model</modelPackage>
+                            <apiPackage>pl.gamedia.coinmarketcap.api</apiPackage>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.openapitools</groupId>
+            <artifactId>jackson-databind-nullable</artifactId>
+            <version>0.2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <version>2.2.6.RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>io.swagger.core.v3</groupId>
+            <artifactId>swagger-annotations</artifactId>
+            <version>2.1.2</version>
+        </dependency>
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger2</artifactId>
+            <version>2.9.2</version>
+        </dependency>
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger-ui</artifactId>
+            <version>2.9.2</version>
+        </dependency>
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+            <version>2.10.6</version>
+        </dependency>
+    </dependencies>
+
+</project>

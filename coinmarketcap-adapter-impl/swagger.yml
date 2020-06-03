@@ -1,0 +1,119 @@
+---
+openapi: "3.0.0"
+info:
+  description: Definition of Cryptocurrency API Adapter Implementation in swagger and openapi 3.0 standard
+  version: 0.0.1
+  title: Cryptocurrency API Adapter Implementation
+
+paths:
+  /currencies/{currency}:
+    get:
+      summary: Retrieves a list of exchange rates from requested platform optionally filtered to provided list of codes
+      parameters:
+        - name: currency
+          in: path
+          schema:
+            type: string
+            default: BTC
+          description: Mandatory parameter specifying a source platform of retrieved cryptocurrency exchange rates
+          required: true
+        - name: filter
+          in: query
+          schema:
+            type: array
+            items:
+              type: string
+          description: Optional parameter limiting list of returned entries to provided cryptocurrency codes
+          required: false
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListExchangeRatesResponse'
+
+  /currencies/exchange:
+    post:
+      summary: Provides an exchange forecast of two cryptocurrencies
+      requestBody:
+        description: Exchange forecast request body
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CurrencyExchangeRequest'
+
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CurrencyExchangeResponse'
+
+
+components:
+  schemas:
+
+    ListExchangeRatesResponse:
+      type: object
+      properties:
+        source:
+          type: string
+        rates:
+          type: object
+          additionalProperties:
+            type: number
+            format: double
+
+    # todo: WTF
+    # todo: amount integer? + to array vs string
+    #  {"from":"currencyA","to":{"currencyB","currencyC"},"amount":121}
+    CurrencyExchangeRequest:
+      type: object
+      readOnly: true
+      properties:
+        from:
+          type: string
+        to:
+          type: object
+          readOnly: true
+          properties:
+            currencyB:
+              type: string
+            currencyC:
+              type: string
+        amount:
+          type: number
+          format: double
+          readOnly: true
+      required:
+        - from
+        - to
+        - amount
+
+    CurrencyExchangeResponse:
+      type: object
+      properties:
+        from:
+          type: string
+        currencyB:
+          $ref: '#/components/schemas/CurrencyExchangeSummary'
+        currencyC:
+          $ref: '#/components/schemas/CurrencyExchangeSummary'
+
+    CurrencyExchangeSummary:
+      type: object
+      properties:
+        rate:
+          type: number
+          format: double
+        amount:
+          type: number
+          format: double
+        result:
+          type: number
+          format: double
+        fee:
+          type: number
+          format: double

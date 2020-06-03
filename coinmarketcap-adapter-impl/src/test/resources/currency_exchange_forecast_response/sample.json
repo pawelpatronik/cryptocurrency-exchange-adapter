@@ -1,0 +1,15 @@
+{
+  "from": "BTC",
+  "currencyB": {
+    "rate": 3.43524562006,
+    "amount": 121.0,
+    "result": 411.5080728272,
+    "fee": 1.21
+  },
+  "currencyC": {
+    "rate": 0.3321,
+    "amount": 121.0,
+    "result": 39.782259,
+    "fee": 1.21
+  }
+}
