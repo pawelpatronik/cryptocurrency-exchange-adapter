@@ -16,6 +16,9 @@ import pl.gamedia.utils.Utilities;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ForkJoinPool;
 import java.util.stream.Collectors;
 
 import static io.vavr.API.$;
@@ -28,7 +31,9 @@ public class GetExchangeForecastProcessor {
 
 	private static final String OPERATION_FAILURE_MESSAGE = "Process failed";
 
-	private final Double feeAmountPercentage;
+	private final double feeAmountPercentage;
+	private final int parallelCalculationThreads;
+	private final boolean isParallelCalculationEnabled;
 
 	private final CryptocurrencyDataProvider cryptocurrencyDataProvider;
 	private final Utilities utilities;
@@ -37,29 +42,63 @@ public class GetExchangeForecastProcessor {
 	public GetExchangeForecastProcessor(
 			CryptocurrencyDataProvider cryptocurrencyDataProvider,
 			Utilities utilities,
-			@Value("${fee.amount.percentage}") Double feeAmountPercentage) {
+			@Value("${fee.amount.percentage}") Double feeAmountPercentage,
+			@Value("${parallel.calculation.threads}") Integer parallelCalculationThreads,
+			@Value("${parallel.calculation.enabled}") boolean isParallelCalculationEnabled) {
 		this.cryptocurrencyDataProvider = cryptocurrencyDataProvider;
 		this.utilities = utilities;
 		this.feeAmountPercentage = feeAmountPercentage;
+		this.parallelCalculationThreads = parallelCalculationThreads;
+		this.isParallelCalculationEnabled = isParallelCalculationEnabled;
 	}
 
 	public Try<CurrencyExchangeResponse> process(CurrencyExchangeRequest request) {
 		return cryptocurrencyDataProvider
-				.getExchangePairList(request.getFrom(), request.getTo())
-				.map(pairList -> validateRetrievedRatesResult(pairList, request.getTo()))
+				.getExchangePairList(request.getFrom(), utilities.toFilterSet(request.getTo()))
+				.map(pairList -> validateRetrievedRatesResult(pairList, utilities.toFilterSet(request.getTo())))
 				.map(exchangeRatesMap -> toCurrencyExchangeSummaryMap(exchangeRatesMap, request.getAmount()))
-				.map(summaryMap -> new CurrencyExchangeResponse()
-						.from(request.getFrom())
-						.to(request
-								.getTo()
-								.stream()
-								.map(toCurrency -> new Tuple2<>(toCurrency, summaryMap.get(toCurrency)))
-								.collect(Collectors.toMap(Tuple2::_1, Tuple2::_2))))
+				.map(summaryMap -> toCurrencyExchangeResponse(request, summaryMap))
 				.mapFailure(Case($(instanceOf(Exception.class)),
 						throwable -> new GetExchangeForecastFailedException(OPERATION_FAILURE_MESSAGE, throwable)));
 	}
 
+	private CurrencyExchangeResponse toCurrencyExchangeResponse(CurrencyExchangeRequest request, Map<String, CurrencyExchangeSummary> summaryMap) {
+		return new CurrencyExchangeResponse()
+				.from(request.getFrom())
+				.to(utilities.toFilterSet(request.getTo())
+						.stream()
+						.map(toCurrency -> new Tuple2<>(toCurrency, summaryMap.get(toCurrency)))
+						.collect(Collectors.toMap(Tuple2::_1, Tuple2::_2)));
+	}
+
 	private Map<String, CurrencyExchangeSummary> toCurrencyExchangeSummaryMap(List<CurrencyExchangePairDto> exchangePairDtos, Double amount) {
+		if (isParallelCalculationEnabled) {
+			ForkJoinPool pool = new ForkJoinPool(parallelCalculationThreads);
+			return Try
+					.of(() -> pool
+							.submit(() -> parallelCalculateCurrencyExchangeSummaries(exchangePairDtos, amount))
+							.get())
+					.mapFailure(Case($(instanceOf(InterruptedException.class)), ex -> getParallelExecutionException(ex)))
+					.mapFailure(Case($(instanceOf(ExecutionException.class)), ex -> getParallelExecutionException(ex)))
+					.andFinally(pool::shutdown)
+					.get();
+		} else {
+			return calculateCurrencyExchangeSummaries(exchangePairDtos, amount);
+		}
+	}
+
+	private RuntimeException getParallelExecutionException(Throwable ex) {
+		return new RuntimeException("Parallel execution failure: " + ex.getMessage(), ex);
+	}
+
+	private Map<String, CurrencyExchangeSummary> parallelCalculateCurrencyExchangeSummaries(List<CurrencyExchangePairDto> exchangePairDtos, Double amount) {
+		return exchangePairDtos
+				.parallelStream()
+				.map(pairDto -> toCurrencyExchangeTuple(pairDto, amount))
+				.collect(Collectors.toMap(Tuple2::_1, Tuple2::_2));
+	}
+
+	private Map<String, CurrencyExchangeSummary> calculateCurrencyExchangeSummaries(List<CurrencyExchangePairDto> exchangePairDtos, Double amount) {
 		return exchangePairDtos
 				.stream()
 				.map(pairDto -> toCurrencyExchangeTuple(pairDto, amount))
@@ -82,7 +121,7 @@ public class GetExchangeForecastProcessor {
 		return amount * feeAmountPercentage / 100;
 	}
 
-	private List<CurrencyExchangePairDto> validateRetrievedRatesResult(List<CurrencyExchangePairDto> pairList, List<String> filter) {
+	private List<CurrencyExchangePairDto> validateRetrievedRatesResult(List<CurrencyExchangePairDto> pairList, Set<String> filter) {
 		if (!Objects.isNull(filter) && utilities.isBothSizeNotEqual(pairList, filter)) {
 			throw new RuntimeException("Requested currency code could not be found in configured currency exchange");
 		}

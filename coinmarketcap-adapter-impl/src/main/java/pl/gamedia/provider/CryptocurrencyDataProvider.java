@@ -10,9 +10,9 @@ import pl.gamedia.coinmarketcap.service.CryptocurrencyMarketPairsLatestService;
 import pl.gamedia.model.CurrencyExchangePairDto;
 import pl.gamedia.utils.Utilities;
 
-import javax.validation.Valid;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
@@ -32,7 +32,7 @@ public class CryptocurrencyDataProvider {
 		this.utilities = utilities;
 	}
 
-	public Try<List<CurrencyExchangePairDto>> getExchangePairList(String baseCurrency, List<String> currencyFilter) {
+	public Try<List<CurrencyExchangePairDto>> getExchangePairList(String baseCurrency, Set<String> currencyFilter) {
 		return cryptocurrencyMarketPairsLatestService
 				.cryptocurrencyMarketPairsLatest(baseCurrency)
 				.map(CryptocurrencyMarketPairsLatestResponse::getData)
@@ -42,14 +42,14 @@ public class CryptocurrencyDataProvider {
 	}
 
 	private List<CryptocurrencyMarketPair> filterSingleExchangeSource(
-			List<CryptocurrencyMarketPair> cryptocurrencyMarketPairs, List<String> currencyFilter) {
+			List<CryptocurrencyMarketPair> cryptocurrencyMarketPairs, Set<String> currencyFilter) {
 		return cryptocurrencyMarketPairs.stream()
 				.filter(this::isFromCurrentlyUsedExchange)
 				.filter(currencyData -> filterCurrencyData(currencyFilter, currencyData))
 				.collect(Collectors.toList());
 	}
 
-	private boolean filterCurrencyData(List<String> filter, CryptocurrencyMarketPair marketPair) {
+	private boolean filterCurrencyData(Set<String> filter, CryptocurrencyMarketPair marketPair) {
 		if (filter != null)
 			return filter.contains(utilities.toQuoteCurrencySymbol(marketPair)) || filter.contains(utilities.toBaseCurrencySymbol(marketPair));
 		else

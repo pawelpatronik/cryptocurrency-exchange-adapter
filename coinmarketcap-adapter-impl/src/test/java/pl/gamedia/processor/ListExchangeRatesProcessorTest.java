@@ -9,18 +9,14 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import pl.gamedia.BaseTest;
 import pl.gamedia.boundary.model.ListExchangeRatesResponse;
-import pl.gamedia.coinmarketcap.model.CryptocurrencyMarketPairsLatestResponse;
-import pl.gamedia.coinmarketcap.service.CryptocurrencyMarketPairsLatestService;
-import pl.gamedia.model.CurrencyExchangePairDto;
 import pl.gamedia.provider.CryptocurrencyDataProvider;
 import pl.gamedia.utils.Utilities;
 
+import java.util.HashSet;
 import java.util.List;
 
 import static java.util.Arrays.asList;
-import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -43,7 +39,7 @@ public class ListExchangeRatesProcessorTest extends BaseTest {
 		// given
 		String source = "BTC";
 		List<String> filter = asList("ETH", "USDT");
-		when(cryptocurrencyDataProvider.getExchangePairList(source, filter))
+		when(cryptocurrencyDataProvider.getExchangePairList(source, new HashSet<>(filter)))
 				.thenReturn(Try.of(() -> load(FILTERED_TEST_CURRENCY_EXCHANGE_PAIR_LIST_PATHNAME,
 						new TypeReference<>() {})));
 
