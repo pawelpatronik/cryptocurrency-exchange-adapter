@@ -21,6 +21,7 @@ public abstract class BaseTest {
 
 	protected static final String LIST_EXCHANGE_RATES_SAMPLE_RESPONSE_JSON_PATHNAME = "src/test/resources/list_exchange_rates_response/sample.json";
 	protected static final String CRYPTOCURRENCY_MARKET_PAIRS_LATEST_RESPONSE_JSON_PATHNAME = "src/test/resources/cryptocurrency_market_pairs_latest_response/sample.json";
+	protected static final String CRYPTOCURRENCY_MARKET_PAIRS_LATEST_RESPONSE_ALL_JSON_PATHNAME = "src/test/resources/cryptocurrency_market_pairs_latest_response/all.json";
 	protected static final String SAMPLE_CURRENCY_EXCHANGE_REQUEST_JSON_PATHNAME = "src/test/resources/currency_exchange_forecast_request/sample.json";
 	protected static final String SAMPLE_CURRENCY_EXCHANGE_RESPONSE_JSON_PATHNAME = "src/test/resources/currency_exchange_forecast_response/sample.json";
 	protected static final String TEST_CURRENCY_EXCHANGE_PAIR_LIST_PATHNAME = "src/test/resources/currency_exchange_pair_list/test_data.json";

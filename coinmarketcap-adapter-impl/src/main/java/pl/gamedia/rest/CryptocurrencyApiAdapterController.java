@@ -1,10 +1,9 @@
 package pl.gamedia.rest;
 
 import io.swagger.annotations.Api;
-import io.vavr.control.Try;
+import io.swagger.annotations.ApiParam;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import pl.gamedia.boundary.api.CurrenciesApi;
 import pl.gamedia.boundary.model.CurrencyExchangeRequest;
 import pl.gamedia.boundary.model.CurrencyExchangeResponse;
@@ -13,6 +12,7 @@ import pl.gamedia.processor.GetExchangeForecastProcessor;
 import pl.gamedia.processor.ListExchangeRatesProcessor;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Size;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
@@ -36,7 +36,13 @@ public class CryptocurrencyApiAdapterController extends AbstractCryptocurrencyAp
 	}
 
 	@Override
-	public CompletableFuture<ResponseEntity<ListExchangeRatesResponse>> currenciesCurrencyGet(String currency, @Valid List<String> filter) {
+	public CompletableFuture<ResponseEntity<ListExchangeRatesResponse>> currenciesCurrencyGet(
+			@Size(min = 2)
+			@ApiParam(value = "Mandatory parameter specifying a source platform of retrieved cryptocurrency exchange rates", required = true, defaultValue = "BTC")
+			@PathVariable("currency") String currency,
+			@ApiParam(value = "Optional parameter limiting list of returned entries to provided cryptocurrency codes")
+			@Valid
+			@RequestParam(value = "filter", required = false) List<String> filter) {
 		return CompletableFuture.supplyAsync(
 				() -> listExchangeRatesProcessor.process(currency, filter)
 						.map(this::toResponseEntity)
@@ -45,7 +51,11 @@ public class CryptocurrencyApiAdapterController extends AbstractCryptocurrencyAp
 	}
 
 	@Override
-	public CompletableFuture<ResponseEntity<CurrencyExchangeResponse>> currenciesExchangePost(@Valid CurrencyExchangeRequest currencyExchangeRequest) {
+	public CompletableFuture<ResponseEntity<CurrencyExchangeResponse>> currenciesExchangePost(
+			@ApiParam(value = "Exchange forecast request body")
+			@Valid
+			@RequestBody(required = false)
+					CurrencyExchangeRequest currencyExchangeRequest) {
 		return CompletableFuture.supplyAsync(
 				() -> getExchangeForecastProcessor.process(currencyExchangeRequest)
 						.map(this::toResponseEntity)

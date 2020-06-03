@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 import pl.gamedia.BaseTest;
@@ -27,6 +28,9 @@ import static pl.gamedia.coinmarketcap.service.impl.CryptocurrencyMarketPairsLat
 		properties = {
 				"source.api.coinmarketcap.endpoint=localhost:8080"
 		})
+@TestPropertySource(
+		locations = "classpath:test_application.properties"
+)
 public class CryptocurrencyMarketPairsLatestServiceImplIntegrationTest extends BaseTest {
 
 	public static final int PORT = 8080;

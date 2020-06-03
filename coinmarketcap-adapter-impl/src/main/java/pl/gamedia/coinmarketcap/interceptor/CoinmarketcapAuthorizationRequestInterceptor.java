@@ -10,8 +10,6 @@ import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
 import pl.gamedia.exception.DataRetrievalException;
 
-import java.io.IOException;
-
 import static io.vavr.API.$;
 import static io.vavr.API.Case;
 import static io.vavr.Predicates.instanceOf;
@@ -31,12 +29,21 @@ public class CoinmarketcapAuthorizationRequestInterceptor implements ClientHttpR
 	}
 
 	@Override
-	public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
+	public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) {
 		request.getHeaders().set(apiKeyHeader, apiKeyValue);
 		return Try.of(() -> execution.execute(request, body))
+				.mapFailure(Case($(instanceOf(Exception.class)), ex -> new DataRetrievalException("Failure during client call execution", ex)))
+				.map(this::verifyResponse)
 				.onSuccess(response -> log.debug("Successful client call execution: " + response.toString()))
 				.onFailure(response -> log.debug("Failure during client call execution: " + response.toString()))
-				.mapFailure(Case($(instanceOf(InterruptedException.class)), ex -> new DataRetrievalException("Failure during client call execution", ex)))
 				.get();
+	}
+
+	private ClientHttpResponse verifyResponse(ClientHttpResponse clientHttpResponse) {
+		if (Try.of(clientHttpResponse::getRawStatusCode)
+				.map(httpStatus -> httpStatus != 200)
+				.get())
+			throw new DataRetrievalException("Failure during data retrieval");
+		return clientHttpResponse;
 	}
 }
