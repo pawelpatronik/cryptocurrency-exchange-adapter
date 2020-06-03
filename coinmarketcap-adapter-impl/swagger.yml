@@ -66,9 +66,6 @@ components:
             type: number
             format: double
 
-    # todo: WTF
-    # todo: amount integer? + to array vs string
-    #  {"from":"currencyA","to":{"currencyB","currencyC"},"amount":121}
     CurrencyExchangeRequest:
       type: object
       readOnly: true
