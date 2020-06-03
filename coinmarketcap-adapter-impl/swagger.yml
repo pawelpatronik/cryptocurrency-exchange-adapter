@@ -76,13 +76,10 @@ components:
         from:
           type: string
         to:
-          type: object
-          readOnly: true
-          properties:
-            currencyB:
-              type: string
-            currencyC:
-              type: string
+          type: array
+          items:
+            type: string
+          minItems: 1
         amount:
           type: number
           format: double
@@ -97,10 +94,10 @@ components:
       properties:
         from:
           type: string
-        currencyB:
-          $ref: '#/components/schemas/CurrencyExchangeSummary'
-        currencyC:
-          $ref: '#/components/schemas/CurrencyExchangeSummary'
+        to:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/CurrencyExchangeSummary'
 
     CurrencyExchangeSummary:
       type: object

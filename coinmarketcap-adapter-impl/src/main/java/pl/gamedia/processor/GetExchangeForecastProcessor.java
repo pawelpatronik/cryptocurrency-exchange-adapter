@@ -8,10 +8,6 @@ import org.springframework.stereotype.Component;
 import pl.gamedia.boundary.model.CurrencyExchangeRequest;
 import pl.gamedia.boundary.model.CurrencyExchangeResponse;
 import pl.gamedia.boundary.model.CurrencyExchangeSummary;
-import pl.gamedia.coinmarketcap.model.CryptocurrencyMarketPair;
-import pl.gamedia.coinmarketcap.model.CryptocurrencyMarketPairsLatestResponse;
-import pl.gamedia.coinmarketcap.model.CryptocurrencyMarketPairsLatestResponseData;
-import pl.gamedia.coinmarketcap.service.CryptocurrencyMarketPairsLatestService;
 import pl.gamedia.exception.GetExchangeForecastFailedException;
 import pl.gamedia.model.CurrencyExchangePairDto;
 import pl.gamedia.provider.CryptocurrencyDataProvider;
@@ -25,7 +21,6 @@ import java.util.stream.Collectors;
 import static io.vavr.API.$;
 import static io.vavr.API.Case;
 import static io.vavr.Predicates.instanceOf;
-import static java.util.Arrays.asList;
 
 @Component
 @Slf4j
@@ -50,19 +45,18 @@ public class GetExchangeForecastProcessor {
 
 	public Try<CurrencyExchangeResponse> process(CurrencyExchangeRequest request) {
 		return cryptocurrencyDataProvider
-				.getExchangePairList(request.getFrom(), toCurrencyFilter(request))
-				.map(pairList -> validateRetrievedRatesResult(pairList, toCurrencyFilter(request)))
+				.getExchangePairList(request.getFrom(), request.getTo())
+				.map(pairList -> validateRetrievedRatesResult(pairList, request.getTo()))
 				.map(exchangeRatesMap -> toCurrencyExchangeSummaryMap(exchangeRatesMap, request.getAmount()))
 				.map(summaryMap -> new CurrencyExchangeResponse()
 						.from(request.getFrom())
-						.currencyB(summaryMap.get(request.getTo().getCurrencyB()))
-						.currencyC(summaryMap.get(request.getTo().getCurrencyC())))
+						.to(request
+								.getTo()
+								.stream()
+								.map(toCurrency -> new Tuple2<>(toCurrency, summaryMap.get(toCurrency)))
+								.collect(Collectors.toMap(Tuple2::_1, Tuple2::_2))))
 				.mapFailure(Case($(instanceOf(Exception.class)),
 						throwable -> new GetExchangeForecastFailedException(OPERATION_FAILURE_MESSAGE, throwable)));
-	}
-
-	private List<String> toCurrencyFilter(CurrencyExchangeRequest request) {
-		return asList(request.getTo().getCurrencyB(), request.getTo().getCurrencyC());
 	}
 
 	private Map<String, CurrencyExchangeSummary> toCurrencyExchangeSummaryMap(List<CurrencyExchangePairDto> exchangePairDtos, Double amount) {

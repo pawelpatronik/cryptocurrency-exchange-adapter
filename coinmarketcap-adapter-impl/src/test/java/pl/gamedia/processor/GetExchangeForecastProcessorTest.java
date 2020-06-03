@@ -10,11 +10,10 @@ import org.mockito.junit.MockitoJUnitRunner;
 import pl.gamedia.BaseTest;
 import pl.gamedia.boundary.model.CurrencyExchangeRequest;
 import pl.gamedia.boundary.model.CurrencyExchangeResponse;
-import pl.gamedia.coinmarketcap.model.CryptocurrencyMarketPairsLatestResponse;
+import pl.gamedia.boundary.model.CurrencyExchangeSummary;
 import pl.gamedia.provider.CryptocurrencyDataProvider;
 import pl.gamedia.utils.Utilities;
 
-import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
@@ -41,7 +40,7 @@ public class GetExchangeForecastProcessorTest extends BaseTest {
 		CurrencyExchangeRequest request = load(SAMPLE_CURRENCY_EXCHANGE_REQUEST_JSON_PATHNAME, CurrencyExchangeRequest.class);
 
 		when(cryptocurrencyDataProvider.getExchangePairList(
-				request.getFrom(), asList(request.getTo().getCurrencyB(), request.getTo().getCurrencyC())))
+				request.getFrom(), request.getTo()))
 				.thenReturn(Try.of(() -> load(FILTERED_TEST_CURRENCY_EXCHANGE_PAIR_LIST_PATHNAME,
 						new TypeReference<>() {})));
 
@@ -51,13 +50,24 @@ public class GetExchangeForecastProcessorTest extends BaseTest {
 		// then
 		CurrencyExchangeResponse expected = load(SAMPLE_CURRENCY_EXCHANGE_RESPONSE_JSON_PATHNAME, CurrencyExchangeResponse.class);
 		assertEquals(expected.getFrom(), response.getFrom());
-		assertEquals(expected.getCurrencyB().getAmount(), response.getCurrencyB().getAmount(), DOUBLE_COMPARISON_DELTA);
-		assertEquals(expected.getCurrencyB().getFee(), response.getCurrencyB().getFee(), DOUBLE_COMPARISON_DELTA);
-		assertEquals(expected.getCurrencyB().getRate(), response.getCurrencyB().getRate(), DOUBLE_COMPARISON_DELTA);
-		assertEquals(expected.getCurrencyB().getResult(), response.getCurrencyB().getResult(), DOUBLE_COMPARISON_DELTA);
-		assertEquals(expected.getCurrencyC().getAmount(), response.getCurrencyC().getAmount(), DOUBLE_COMPARISON_DELTA);
-		assertEquals(expected.getCurrencyC().getFee(), response.getCurrencyC().getFee(), DOUBLE_COMPARISON_DELTA);
-		assertEquals(expected.getCurrencyC().getRate(), response.getCurrencyC().getRate(), DOUBLE_COMPARISON_DELTA);
-		assertEquals(expected.getCurrencyC().getResult(), response.getCurrencyC().getResult(), DOUBLE_COMPARISON_DELTA);
+		String firstCurrency = request.getTo().get(0);
+		String secondCurrency = request.getTo().get(1);
+		assertDoubleValue(getExchangeSummary(expected, firstCurrency).getAmount(), getExchangeSummary(response, firstCurrency).getAmount());
+		assertDoubleValue(getExchangeSummary(expected, firstCurrency).getFee(), getExchangeSummary(response, firstCurrency).getFee());
+		assertDoubleValue(getExchangeSummary(expected, firstCurrency).getRate(), getExchangeSummary(response, firstCurrency).getRate());
+		assertDoubleValue(getExchangeSummary(expected, firstCurrency).getResult(), getExchangeSummary(response, firstCurrency).getResult());
+		assertDoubleValue(getExchangeSummary(expected, secondCurrency).getAmount(), getExchangeSummary(response, secondCurrency).getAmount());
+		assertDoubleValue(getExchangeSummary(expected, secondCurrency).getFee(), getExchangeSummary(response, secondCurrency).getFee());
+		assertDoubleValue(getExchangeSummary(expected, secondCurrency).getRate(), getExchangeSummary(response, secondCurrency).getRate());
+		assertDoubleValue(getExchangeSummary(expected, secondCurrency).getResult(), getExchangeSummary(response, secondCurrency).getResult());
+	}
+
+	private void assertDoubleValue(Double amount, Double amount2) {
+		assertEquals(amount,
+				amount2, DOUBLE_COMPARISON_DELTA);
+	}
+
+	private CurrencyExchangeSummary getExchangeSummary(CurrencyExchangeResponse response, String currency) {
+		return response.getTo().get(currency);
 	}
 }
