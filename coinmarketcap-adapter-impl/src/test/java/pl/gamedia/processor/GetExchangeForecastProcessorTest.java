@@ -63,13 +63,13 @@ public class GetExchangeForecastProcessorTest extends BaseTest {
 		assertEquals(expected.getFrom(), response.getFrom());
 		String firstCurrency = request.getTo().get(0);
 		String secondCurrency = request.getTo().get(1);
-		assertDoubleValue(getExchangeSummary(expected, firstCurrency).getAmount(), getExchangeSummary(response, firstCurrency).getAmount());
-		assertDoubleValue(getExchangeSummary(expected, firstCurrency).getFee(), getExchangeSummary(response, firstCurrency).getFee());
-		assertDoubleValue(getExchangeSummary(expected, firstCurrency).getRate(), getExchangeSummary(response, firstCurrency).getRate());
-		assertDoubleValue(getExchangeSummary(expected, firstCurrency).getResult(), getExchangeSummary(response, firstCurrency).getResult());
-		assertDoubleValue(getExchangeSummary(expected, secondCurrency).getAmount(), getExchangeSummary(response, secondCurrency).getAmount());
-		assertDoubleValue(getExchangeSummary(expected, secondCurrency).getFee(), getExchangeSummary(response, secondCurrency).getFee());
-		assertDoubleValue(getExchangeSummary(expected, secondCurrency).getRate(), getExchangeSummary(response, secondCurrency).getRate());
-		assertDoubleValue(getExchangeSummary(expected, secondCurrency).getResult(), getExchangeSummary(response, secondCurrency).getResult());
+		assertEquals(getExchangeSummary(expected, firstCurrency).getAmount(), getExchangeSummary(response, firstCurrency).getAmount());
+		assertEquals(getExchangeSummary(expected, firstCurrency).getFee(), getExchangeSummary(response, firstCurrency).getFee());
+		assertEquals(getExchangeSummary(expected, firstCurrency).getRate(), getExchangeSummary(response, firstCurrency).getRate());
+		assertEquals(getExchangeSummary(expected, firstCurrency).getResult(), getExchangeSummary(response, firstCurrency).getResult());
+		assertEquals(getExchangeSummary(expected, secondCurrency).getAmount(), getExchangeSummary(response, secondCurrency).getAmount());
+		assertEquals(getExchangeSummary(expected, secondCurrency).getFee(), getExchangeSummary(response, secondCurrency).getFee());
+		assertEquals(getExchangeSummary(expected, secondCurrency).getRate(), getExchangeSummary(response, secondCurrency).getRate());
+		assertEquals(getExchangeSummary(expected, secondCurrency).getResult(), getExchangeSummary(response, secondCurrency).getResult());
 	}
 }

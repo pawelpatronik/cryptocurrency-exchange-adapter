@@ -63,8 +63,8 @@ components:
         rates:
           type: object
           additionalProperties:
-            type: number
-            format: double
+            type: string
+            pattern: '^\d+([.]\d+)?$'
 
     CurrencyExchangeRequest:
       type: object
@@ -78,8 +78,8 @@ components:
             type: string
           minItems: 1
         amount:
-          type: number
-          format: double
+          type: string
+          pattern: '^\d+([.]\d+)?$'
           readOnly: true
       required:
         - from
@@ -100,14 +100,14 @@ components:
       type: object
       properties:
         rate:
-          type: number
-          format: double
+          type: string
+          pattern: '^\d+([.]\d+)?$'
         amount:
-          type: number
-          format: double
+          type: string
+          pattern: '^\d+([.]\d+)?$'
         result:
-          type: number
-          format: double
+          type: string
+          pattern: '^\d+([.]\d+)?$'
         fee:
-          type: number
-          format: double
+          type: string
+          pattern: '^\d+([.]\d+)?$'
